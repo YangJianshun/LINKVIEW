@@ -92,7 +92,7 @@ optional arguments:
 ```
 ### 使用方法说明
 
-1. 输入文件
+1. 输入文件 <br>
     在使用LINKVIEW作图前，需要先准备一个如下格式的文件：
     
     ```chr1 start1 end1 chr2 start2 end2 color:opacity```
@@ -112,7 +112,7 @@ optional arguments:
     ./LINKVIEW.py [-t TYPE] input
     LINKVIEW 会自动分配染色体在图中的位置。
     <br>
-2. KARYOTYPE文件
+2. KARYOTYPE文件 <br>
     若不指定KARYOTYPE文件，LLINKVIEW会绘制输入文件中的所有染色体，并自动分配它们在图中的位置。
     通过-k参数指定一个KARYOTYPE文件，可以指定需要绘制的染色体及其在图中的位置和所需绘制的区间。
     KARYOTYPE 格式下：
@@ -123,14 +123,14 @@ optional arguments:
     每一行对应图中的每一横排，上面内容的含义是将chr1和chr2绘制在第一横排，且chr1在左，chr2在右，chr3绘制在第二横排；
     start和end指定需要绘制的该染色体的区间，可以省略，若省略，则LINKVIEW会根据输入文件计算出包含所有alignment的最小区间。
     <br>
-3. HIGHLIGHT文件
+3. HIGHLIGHT文件 <br>
     LINKVIEW 可以将染色体上部分区段高亮显示。
     通过 -hl参数指定一个HIGHLIGHT文件，格式如下：
     ```chr start end [color]```
     该文件每一行表示一个高亮区块，上面内容表示chr的start到end区间显示为高亮，
     可以在最后指定颜色，否则为默认颜色为red
     <br>
-4. CHR_LEN文件
+4. CHR_LEN文件 <br>
    通过--chr_len参数指定CHR_LEN文件，格式如下：
     ```
     chr1 len1
@@ -138,7 +138,7 @@ optional arguments:
     ```
     该文件指定每条染色体的长度，如果指定该文件，KARYOTYPE文件中指定的染色体区间不完整时，不完整的部分将以一条短横线代替
     <br>
-5. 其它参数
+5. 其它参数 <br>
    
   <table>
   <tr>
@@ -201,11 +201,11 @@ svg_font_size=20
 <br>
 <br>
 <hr>
-<div style="float:right">
+
 联系邮箱：<br>
 <a href="mailto:shunlintianxia@sina.com">shunlintianxia@sina.com</a><br>
 <a href="mailto:397441459@qq.com">397441459@qq.com</a>
-<div>
+
 
          
 
