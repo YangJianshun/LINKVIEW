@@ -38,6 +38,16 @@ class FormatError(Exception):
         if (self.ErrorType=="karyotype_start_end"):
             return("\n\t[Error] Wrong format in karyotype file '{}':\n\t{}\n\tEnd must be larger than start".format(self.FileName,self.Line))
 
+class FatalError(Exception):
+    def __init__(self,ErrorType,chro_name):
+        self.ErrorType = ErrorType
+        self.chro_name = chro_name
+    def __str__(self):
+        if(self.ErrorType==1):
+            return('\n\t[Error] {} has no alignment in the corresponding area!\n\tPlease relax the filter or change the KARYOTYPE\n'.format(self.chro_name))
+        if(self.ErrorType==2):
+            return('\n\t[Error] Did not find any alignment!\n\tPlease relax the filter or modify the KARYOTYPE\n')
+
 class chro():
     def __init__(self,name,start,end,is_full):
         self.name=name
@@ -172,25 +182,27 @@ def main(args):
                 posofchro[relation['chr2']].append(relation['start2'])
                 posofchro[relation['chr2']].append(relation['end2'])
         for c in auto_start_end:
+            if not posofchro[c]: raise FatalError(1,c)
             chro_lst[c].start=min(posofchro[c])
             chro_lst[c]=chro(c,min(posofchro[c]),max(posofchro[c]),[True,True])
 
     else:
     #====Arrange the order of chro_lst on the image. If you specify a Karyotype file, this step is omitted.===
         link={}
+        if not relations: raise FatalError(2,'')
         for relation in relations:
             chr1=relation['chr1'];chr2=relation['chr2']
             link.setdefault(chr1,[]);link.setdefault(chr2,[])
             if not chr2 in link[chr1]:link[chr1].append(chr2)
             if not chr1 in link[chr2]:link[chr2].append(chr1)
 
-
+        global chro_ordered
         chro_ordered=[]
         first=min(link.keys(),key=lambda x:len(link[x]))
         chro_ordered.append(first)
         order[0]=[first]
         def find_next(pos,*chrs):
-            nonlocal  chro_ordered
+            global  chro_ordered
             nexts=[]
             for chro in chrs:
                 for next in link[chro]:
