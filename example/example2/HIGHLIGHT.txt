@@ -1,0 +1,3 @@
+Contig62	3171530	3181861	blue
+scaffold_0003	324741	335073	yellow
+scaffold_0005	1	10333	yellow

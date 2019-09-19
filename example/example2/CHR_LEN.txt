@@ -1,0 +1,4 @@
+Contig62	3557091
+scaffold_0003	335073
+scaffold_0004	10497
+scaffold_0005	1587006
