@@ -1,1 +1,2 @@
-../../LINKVIEW.py -t 1 --svg_label_angle 30 -k KARYOTYPE.txt --chr_len CHR_LEN.txt --min_alignment_length 5000 -o LINKVIEW.OUT blast.out -hl HIGHLIGHT.txt --svg_axis
+perl -n -e 'next if $.<6;chomp;s/^\s+|\s+$//g;@items=split /\s+\|\s+|\s+/;($start1,$end1,$start2,$end2,$chr1,$chr2) = @items[0,1,2,3,-2,-1];$color="";if(($start1-$end1)*($start2-$end2)<0){$color="red"};print "$chr1\t$start1\t$end1\t$chr2\t$start2\t$end2\t$color\n";' ../example1/Ath_ctg.delta.filter.coords > alignment.txt
+LINKVIEW.py  alignment.txt --chro_len len.txt -k k.txt --chro_axis -o example2

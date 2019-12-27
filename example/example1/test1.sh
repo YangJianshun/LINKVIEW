@@ -1,1 +1,1 @@
-../../LINKVIEW.py link.txt
+LINKVIEW.py -t2 Ath_ctg.delta.filter.coords
