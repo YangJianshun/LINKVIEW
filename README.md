@@ -5,8 +5,12 @@ LINKVIEW 是一个将序列比对结果（或其它任何适合的数据）进�
 ![染色体比对图](imgs/example2.png)
 ![局部比对图](imgs/example3.png)
 
-### python版本
-在 2.7.9 和 3.6.2 测试通过
+### 项目依赖
+
+#### python
+在 python 2.7.9 和 3.6.2 测试通过
+#### inkscape
+svg转为png时需要调用inkscape，在 inkscape 0.91 测试通过
 
 ### 使用方法说明
 
