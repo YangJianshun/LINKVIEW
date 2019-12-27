@@ -18,7 +18,6 @@ LINKVIEW 是一个将序列比对结果（或其它任何适合的数据）进�
     chr1和chr2表示序列(染色体)名称；
     start1、end1、start2、end2为位点位置(bp，整数)，表示chr1的start1到end1比对上chr2的start2到end2；
     color:opacity 表示该比对块绘制的颜色和透明度，可以省略，缺省值按照指定的风格有所不同。
-    
     <br>
 
     可以之间将比对软件的输出作为LINKVIEW的输入文件，目前支持blastn(tabular格式，见example3)和MUMmer(show-coords生成的文件，见example1)
