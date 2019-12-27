@@ -5,12 +5,8 @@ LINKVIEW 是一个将序列比对结果（或其它任何适合的数据）进�
 ![染色体比对图](imgs/example2.png)
 ![局部比对图](imgs/example3.png)
 
-### 项目依赖
-
-#### python
-在 python 2.7.9 和 3.6.2 测试通过
-#### inkscape
-svg转为png时需要调用inkscape，在 inkscape 0.91 测试通过
+### python版本
+在 2.7.9 和 3.6.2 测试通过
 
 ### 使用方法说明
 
@@ -22,14 +18,17 @@ svg转为png时需要调用inkscape，在 inkscape 0.91 测试通过
     chr1和chr2表示序列(染色体)名称；
     start1、end1、start2、end2为位点位置(bp，整数)，表示chr1的start1到end1比对上chr2的start2到end2；
     color:opacity 表示该比对块绘制的颜色和透明度，可以省略，缺省值按照指定的风格有所不同。
+    
     <br>
 
-    可以之间将比对软件的输出作为LINKVIEW的输入文件，目前支持blastn(tabular格式，见example3)和MUMmer(show-coords生成的文件，见example1)
+    可以直接将比对软件的输出作为LINKVIEW的输入文件，目前支持blastn(tabular格式，见example3)和MUMmer(show-coords生成的文件，见example1)
 
     <br>
 
     当准备好输入文件后，即可运行LINKVIEW：
-    ```./LINKVIEW.py [-t TYPE] input```
+    ```
+    ./LINKVIEW.py [-t TYPE] input
+    ```
 
     <br>
 2. KARYOTYPE文件 <br>
@@ -46,7 +45,9 @@ svg转为png时需要调用inkscape，在 inkscape 0.91 测试通过
 3. HIGHLIGHT文件 <br>
     LINKVIEW 可以将染色体上部分区段高亮显示。
     通过 -hl参数指定一个HIGHLIGHT文件，格式如下：
-    ```chr start end [color]```
+    ```
+    chr start end [color]
+    ```
     该文件每一行表示一个高亮区块，上面内容表示chr的start到end区间显示为高亮，
     颜色可以省略，默认颜色为red
     <br>
