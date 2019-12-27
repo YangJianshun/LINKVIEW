@@ -1,2 +1,0 @@
-Contig62
-scaffold_0003:314410:335073	scaffold_0004:1:10497	scaffold_0005:1:20664
