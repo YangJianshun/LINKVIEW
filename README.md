@@ -5,8 +5,11 @@ LINKVIEW 是一个将序列比对结果（或其它任何适合的数据）进�
 ![染色体比对图](imgs/example2.png)
 ![局部比对图](imgs/example3.png)
 
-### python版本
-在 2.7.9 和 3.6.2 测试通过
+### 项目依赖
+#### python
+在 ptyhon 2.7.9 和 3.6.2 测试通过
+#### inkscape
+svg 转 png 时需要调用 inkscape, 在 inkscape 0.91 测试通过
 
 ### 使用方法说明
 
@@ -123,10 +126,10 @@ LINKVIEW 是一个将序列比对结果（或其它任何适合的数据）进�
   </tr>
 </table>
 
-值得注意的是，可以通过-P指定PARAMETER文件，为每一横排指定参数，PARAMETER文件的每一行对应作图的每一横排，格式为parameter=value，例如：
+值得注意的是，可以通过-p指定PARAMETER文件，为每一横排指定参数，PARAMETER文件的每一行对应作图的每一横排，格式为parameter=value，例如：
 ```
-svg_axis=1 svg_label_angle=30
-svg_font_size=20
+chro_axis=1 label_angle=30
+label_font_size=20
 ```
 上面内容的含义是，作图的第一横排显示刻度，标签旋转30°，第二横排字体大小为20px
 
