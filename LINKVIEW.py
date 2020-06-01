@@ -816,7 +816,8 @@ def main(args):
             start = int(items[1])
             end = int(items[2]) + 1
 
-            chros = [x for x in all_names if x.startswith(chro)]
+            chros = [x for x in all_names if x == chro or x.startswith(chro + split_mark)]
+            
             for chro in chros:
                 if not chro in chro_lst: continue
                 relation_tmp = interval.relation([start,end],[chro_lst[chro].start,chro_lst[chro].end])
