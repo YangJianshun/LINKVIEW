@@ -24,7 +24,8 @@ svg 转 png 时需要调用 inkscape, 在 inkscape 0.91 测试通过
     
     
 
-     可以直接将比对软件的输出作为LINKVIEW的输入文件，目前支持blastn(tabular格式，见example3)和MUMmer(show-coords生成的文件，见example1)
+     可以直接将比对软件的输出作为LINKVIEW的输入文件，目前支持blastn(tabular格式，见example3)和MUMmer(show-coords生成的文件，见example1)，
+     以及minimap2(paf格式)
     
     
 
@@ -138,6 +139,7 @@ label_font_size=20
 
 ### 升级说明
 - 2020.05.22： 输入文件可以同时指定多个，通过逗号（,）分隔；KARYOTYPE文件文件中可以重复写同一个序列名
+- 2020.06.01：输入文件格式支持minimap2的输出格式paf
 
 
 <hr>
