@@ -838,7 +838,7 @@ def main(args):
     O.write(svg_content)
     O.close()
 
-    #os.system('inkscape --file {}.svg --export-png {}.png --export-background white --export-dpi 350'.format(args.output,args.output))   
+    os.system('inkscape --file {}.svg --export-png {}.png --export-background white --export-dpi 350'.format(args.output,args.output))   
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
