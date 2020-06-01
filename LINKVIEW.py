@@ -825,7 +825,9 @@ def main(args):
                     continue
                 elif relation_tmp == 2 or relation_tmp == 3 :
                     start,end = interval.intersection([start,end],[chro_lst[chro].start,chro_lst[chro].end])
-                svg_content_highlight += '''<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'''.format(chro_lst[chro].coordinate(start,is_up,is_start=True)[0],chro_lst[chro].top, chro_lst[chro].coordinate(end,is_up)[0]-chro_lst[chro].coordinate(start,is_up,is_start=True)[0],args.chro_thickness,color)
+                highlight_width = chro_lst[chro].coordinate(end,is_up)[0]-chro_lst[chro].coordinate(start,is_up,is_start=True)[0]
+                if args.hl_min1px: highlight_width = 1
+                svg_content_highlight += '''<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'''.format(chro_lst[chro].coordinate(start,is_up,is_start=True)[0],chro_lst[chro].top, highlight_width,args.chro_thickness,color)
         H.close()
 
 
@@ -848,6 +850,7 @@ if __name__ == '__main__':
     1 for output file of blast format as "query subject identity alignment_length mismatches gap_opens q.start q.end s.start s.end evalue bit score"; 
     2 for output file of nucmer; 3 for output file of minimap2.\tdefault=0''')
     parser.add_argument('-hl','--highlight',help='highlight.txt, Highlight section, format like chr start end [color]')
+    parser.add_argument('--hl_min1px',action="store_true",help='The width of each highlight is at least one pixel')
     parser.add_argument('-k','--karyotype',help="Karyotype.txt, If you don't specify this file, it will automatically sort and display.format like chro1:[start1:end1] chro2...")
     parser.add_argument('--svg_height',default=800,type=int,help='height of svg, default=800')
     parser.add_argument('--svg_width',default=1200,type=int,help='width of svg, default=1200')
