@@ -826,7 +826,7 @@ def main(args):
                 elif relation_tmp == 2 or relation_tmp == 3 :
                     start,end = interval.intersection([start,end],[chro_lst[chro].start,chro_lst[chro].end])
                 highlight_width = chro_lst[chro].coordinate(end,is_up)[0]-chro_lst[chro].coordinate(start,is_up,is_start=True)[0]
-                if args.hl_min1px: highlight_width = 1
+                if args.hl_min1px and highlight_width < 1: highlight_width = 1
                 svg_content_highlight += '''<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'''.format(chro_lst[chro].coordinate(start,is_up,is_start=True)[0],chro_lst[chro].top, highlight_width,args.chro_thickness,color)
         H.close()
 
