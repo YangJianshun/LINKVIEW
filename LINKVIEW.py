@@ -719,48 +719,53 @@ def main(args):
                     gene_structure_svg += '<path d="M{},{} L{},{} L{},{} L{},{} L{},{} Z" fill="{}" opacity="{}" clip-path="url(#clipPath1)" class="UTR5"/>\n'.format(x2,y1, x2,y2, x3,y2, x1,y3, x3,y1, "purple",1)
                 
         return gene_structure_svg
-
-        pass
     
     bottom_level=len(order)-1
 
-    svg_content_line = ''
-    svg_content_chro = ''
-    svg_content_clipPath = '<defs><clipPath id="clipPath1">\n'
-    svg_content_label = ''
-    svg_content_align = ''
-    svg_content_scale = ''
-    svg_content_highlight = ''
-    svg_content_axis = ''
-    svg_content_gene = ''
-
+    svg_content_line = []
+    svg_content_chro = []
+    svg_content_clipPath = ['<defs><clipPath id="clipPath1">']
+    svg_content_label = []
+    svg_content_align = []
+    svg_content_scale = []
+    svg_content_highlight = []
+    svg_content_axis = []
+    svg_content_gene = []
 
     for chro in chro_lst:
         if not any([chro in x for x in order]): continue
         angle_text = ''
         if not chro_lst[chro].is_full[0]:
-            svg_content_line += '''<line x1="{}" y1="{}" x2="{}" y2="{}" class="line"/>\n'''.format(chro_lst[chro].left-line_length,chro_lst[chro].top+args.chro_thickness/2,chro_lst[chro].left,chro_lst[chro].top+args.chro_thickness/2)
-        svg_content_chro += '''<rect x="{}" y="{}" width="{}" height="{}" fill="grey" class="chro"/>\n'''.format(chro_lst[chro].left, chro_lst[chro].top, chro_lst[chro].right-chro_lst[chro].left, args.chro_thickness)
+            svg_content_line.append(
+                '<line x1="{}" y1="{}" x2="{}" y2="{}" class="line"/>\n'.format(chro_lst[chro].left-line_length,chro_lst[chro].top+args.chro_thickness/2,chro_lst[chro].left,chro_lst[chro].top+args.chro_thickness/2)
+                )
+        svg_content_chro.append(
+            '<rect x="{}" y="{}" width="{}" height="{}" fill="grey" class="chro"/>\n'.format(chro_lst[chro].left, chro_lst[chro].top, chro_lst[chro].right-chro_lst[chro].left, args.chro_thickness)
+            )
 
         #如果指定了gff文件则绘制基因结构
         if(args.gff):
-            svg_content_clipPath += '''<rect x="{}" y="{}" width="{}" height="{}" fill="grey" class="chro"/>\n'''.format(chro_lst[chro].left, chro_lst[chro].top, chro_lst[chro].right-chro_lst[chro].left, args.chro_thickness)
-            svg_content_gene += get_gene_structure(chro)
+            svg_content_clipPath.append(
+                '<rect x="{}" y="{}" width="{}" height="{}" fill="grey" class="chro"/>\n'.format(chro_lst[chro].left, chro_lst[chro].top, chro_lst[chro].right-chro_lst[chro].left, args.chro_thickness)
+                )
+            svg_content_gene.append(get_gene_structure(chro))
         if not chro_lst[chro].is_full[1]:
-            svg_content_line += '''<line x1="{}" y1="{}" x2="{}" y2="{}" class="line"/>\n'''.format(chro_lst[chro].right,chro_lst[chro].top+args.chro_thickness/2,chro_lst[chro].right+line_length,chro_lst[chro].top+args.chro_thickness/2)
+            svg_content_line.append(
+                '<line x1="{}" y1="{}" x2="{}" y2="{}" class="line"/>\n'.format(chro_lst[chro].right,chro_lst[chro].top+args.chro_thickness/2,chro_lst[chro].right+line_length,chro_lst[chro].top+args.chro_thickness/2)
+            )
 
         if(chro_lst[chro].level == 0):
             label_x = chro_lst[chro].left
             label_y = chro_lst[chro].top-args.chro_thickness/2 - 5
             if chro_axis[chro_lst[chro].level]:
-                svg_content_axis += get_svg_content_Axis(chro,'top')
+                svg_content_axis.append(get_svg_content_Axis(chro,'top'))
                 label_y -= 25
         elif(chro_lst[chro].level==bottom_level):
             label_x = chro_lst[chro].left
             label_y = chro_lst[chro].top+args.chro_thickness*2 + 5
             label_y += args.chro_thickness - 1
             if chro_axis[chro_lst[chro].level]:
-                svg_content_axis += get_svg_content_Axis(chro,'bottom')
+                svg_content_axis.append(get_svg_content_Axis(chro,'bottom'))
                 label_y += 25
         else:
             label_x = chro_lst[chro].right+label_font_size[chro_lst[chro].level]/5
@@ -770,8 +775,10 @@ def main(args):
             label = chro_lst[chro].name
             if int(show_pos_with_label[chro_lst[chro].level]):label="{} {:,} ~ {:,} bp".format(label,chro_lst[chro].start,chro_lst[chro].end);
             angle_text = 'transform="rotate({},{} {})"'.format(label_angle[chro_lst[chro].level],label_x,label_y)
-            svg_content_label += '''<text x="{}" y="{}" fill="black" font-size="{}" {} class="label">{}</text>\n'''.format(label_x,label_y,label_font_size[chro_lst[chro].level],angle_text,label)
-    svg_content_clipPath += '</clipPath></defs>\n'
+            svg_content_label.append(
+                '<text x="{}" y="{}" fill="black" font-size="{}" {} class="label">{}</text>\n'.format(label_x,label_y,label_font_size[chro_lst[chro].level],angle_text,label)
+            )
+    svg_content_clipPath.append('</clipPath></defs>\n')
     for relation in relations:
         chro1 = relation['chro1']
         chro2 = relation['chro2']
@@ -795,13 +802,21 @@ def main(args):
             bezier_coor2 = [ vertex2[0], min(vertex1[1], vertex2[1]) + abs(vertex1[1] - vertex2[1])/3*multipliers[1] ]
             bezier_coor3 = [ vertex3[0], min(vertex3[1], vertex4[1]) + abs(vertex3[1] - vertex4[1])/3*multipliers[2] ]
             bezier_coor4 = [ vertex4[0], min(vertex3[1], vertex4[1]) + abs(vertex3[1] - vertex4[1])/3*multipliers[3] ]
-            svg_content_align += '''<path d="M{},{} C{},{} {},{} {},{} L{},{} C{},{} {},{} {},{} Z" {} class="align"/>\n'''.format(vertex1[0], vertex1[1], bezier_coor1[0], bezier_coor1[1], bezier_coor2[0], bezier_coor2[1], vertex2[0], vertex2[1], vertex3[0], vertex3[1], bezier_coor3[0], bezier_coor3[1], bezier_coor4[0], bezier_coor4[1], vertex4[0], vertex4[1], particular_style)
+            svg_content_align.append(
+                '<path d="M{},{} C{},{} {},{} {},{} L{},{} C{},{} {},{} {},{} Z" {} class="align"/>\n'.format(vertex1[0], vertex1[1], bezier_coor1[0], bezier_coor1[1], bezier_coor2[0], bezier_coor2[1], vertex2[0], vertex2[1], vertex3[0], vertex3[1], bezier_coor3[0], bezier_coor3[1], bezier_coor4[0], bezier_coor4[1], vertex4[0], vertex4[1], particular_style)
+            )
         else:
-            svg_content_align += '''<path d="M{},{} L{},{} L{},{} L{},{} Z" {} class="align"/>\n'''.format(vertex1[0], vertex1[1], vertex2[0], vertex2[1], vertex3[0], vertex3[1], vertex4[0], vertex4[1], particular_style)
+            svg_content_align.append(
+                '<path d="M{},{} L{},{} L{},{} L{},{} Z" {} class="align"/>\n'.format(vertex1[0], vertex1[1], vertex2[0], vertex2[1], vertex3[0], vertex3[1], vertex4[0], vertex4[1], particular_style)
+            )
     scale_x = args.svg_width*(1-args.svg_space/2)-L*scale;scale_y=args.svg_height*0.9
     if(not args.no_scale):
-        svg_content_scale += '''<polyline points="{},{} {},{} {},{} {},{} " fill="none" stroke="black" class="scale"/>\n'''.format(scale_x,scale_y-5,scale_x,scale_y,scale_x+L*scale,scale_y,scale_x+L*scale,scale_y-5)
-        svg_content_scale += '''<text x="{}" y="{}" fill="black"  font-size="{}" class="scale-text">{}</text>\n'''.format(scale_x+L*scale/3,scale_y-10,args.label_font_size,S)
+        svg_content_scale.append(
+            '<polyline points="{},{} {},{} {},{} {},{} " fill="none" stroke="black" class="scale"/>\n'.format(scale_x,scale_y-5,scale_x,scale_y,scale_x+L*scale,scale_y,scale_x+L*scale,scale_y-5)
+        )
+        svg_content_scale.append(
+            '<text x="{}" y="{}" fill="black"  font-size="{}" class="scale-text">{}</text>\n'.format(scale_x+L*scale/3,scale_y-10,args.label_font_size,S)
+        )
     
     if(args.highlight):
         if not os.path.exists(args.highlight): raise ArgumentError('highlight',args.highlight)
@@ -827,16 +842,18 @@ def main(args):
                     start,end = interval.intersection([start,end],[chro_lst[chro].start,chro_lst[chro].end])
                 highlight_width = chro_lst[chro].coordinate(end,is_up)[0]-chro_lst[chro].coordinate(start,is_up,is_start=True)[0]
                 if args.hl_min1px and highlight_width < 1: highlight_width = 1
-                svg_content_highlight += '''<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'''.format(chro_lst[chro].coordinate(start,is_up,is_start=True)[0],chro_lst[chro].top, highlight_width,args.chro_thickness,color)
+                svg_content_highlight.append(
+                    '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />\n'.format(chro_lst[chro].coordinate(start,is_up,is_start=True)[0],chro_lst[chro].top, highlight_width,args.chro_thickness,color)
+                )
         H.close()
 
+    svg_content = ['<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg" version="1.1">']
+    for svg_content_partial in [svg_content_style, svg_content_line, svg_content_chro, svg_content_label, svg_content_align, svg_content_scale, svg_content_highlight, svg_content_axis, svg_content_gene, svg_content_clipPath]:
+        svg_content.extend(svg_content_partial)
+    svg_content.append('</svg>')
+    svg_content = ''.join(svg_content)
 
-    svg_content = '<svg width="{}" height="{}" xmlns="http://www.w3.org/2000/svg" version="1.1">\n'.format(args.svg_width,args.svg_height)
-    svg_content += (svg_content_style + svg_content_line + svg_content_chro + svg_content_label + svg_content_align + svg_content_scale + svg_content_highlight + svg_content_axis + svg_content_gene + svg_content_clipPath)
-    svg_content += '</svg>\n'
-    #=========================================================================
-
-    print(svg_content)
+    #print(svg_content)
     O = open(args.output+'.svg','w')
     O.write(svg_content)
     O.close()
@@ -881,4 +898,3 @@ if __name__ == '__main__':
     if args.label_angle:args.label_angle = 360-float(args.label_angle)
 
     main(args)
-
