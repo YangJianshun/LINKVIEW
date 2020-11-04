@@ -140,41 +140,72 @@ def parse_gff(gffs):
     #mRNA_info 起辅助作用
     global mRNA_info
     mRNA_info = {}
+    gene_type_name_set = {'gene', 'GENE'}
+    mRNA_type_name_set = {'mRNA', 'mrna', 'MRNA'}
+    CDS_type_name_set = {'CDS', 'cds'}
+    exon_type_name_set = {'exon', 'EXON'}
+    UTR3_type_name_set = {'three_prime_UTR', '3_UTR'}
+    UTR5_type_name_set = {'five_prime_UTR', '5_UTR'}
+    def parse_attributes(attr):
+        res = {}
+        if not attr.endswith(';'): attr += ';'
+        contentFlag = False
+        lastPos = 0
+        for i, c in enumerate(attr):
+            if c == '"':
+                contentFlag = not contentFlag
+            elif c == ';' and not contentFlag:
+                item = attr[lastPos: i]
+                tmpArr = item.split('=')
+                key = tmpArr[0]
+                val = tmpArr[1].strip(' "') if len(tmpArr) >= 2 else None
 
-    def parse_attributes(attributes_str):
-        attributes = attributes_str.split(';')
-        attributes_info = {}
-        for attribute in attributes:
-            key,value = attribute.split('=')
-            attributes_info[key] = value
-        return attributes_info
+                res[key] = val
+                lastPos = i + 1
+        return res
     def parse_single_gff(gff):
+        
         GFF = open(gff,'r')
         for line in GFF:
+            if line.startswith('#'): continue
             line=line.strip()
-            if line=='': continue
+            if line == '': continue
             items = line.split('\t')
-            if len(items) != 9: raise FormatError('gff',gff,line)
-            seqid,source,gene_type,start,end,score,strand,phase,attributes = items
+            if len(items) != 9: raise FormatError('gff', gff, line)
+            seqid, source, gene_type, start, end, score, strand, phase, attributes = items
             start = int(start)
             end = int(end)
             attributes_info = parse_attributes(attributes)
-            if gene_type == 'gene':
+            if gene_type in gene_type_name_set:
                 gene_id = attributes_info['ID']
-                gene_info.setdefault(gene_id,{})
+                gene_info.setdefault(gene_id, {})
                 gene_info[gene_id]['chro'] = seqid
                 gene_info[gene_id]['strand'] = strand
-                gene_info[gene_id]['gene'] = (start,end)
-            elif gene_type == 'mRNA':
-                if not 'Parent' in attributes_info: raise FormatError('gff_no_parent',gff,line)
+                gene_info[gene_id]['gene'] = (start, end)
+            elif gene_type in mRNA_type_name_set:
+                # if not 'Parent' in attributes_info: raise FormatError('gff_no_parent',gff,line)
+                if not 'Parent' in attributes_info:
+                    gene_id = '{}_gene'.format(attributes_info['ID'])
+                    gene_info.setdefault(gene_id, {})
+                    gene_info[gene_id]['chro'] = seqid
+                    gene_info[gene_id]['strand'] = strand
+                    gene_info[gene_id]['gene'] = (start, end)
+                    attributes_info['Parent'] = gene_id
+                    # attributes_info['Parent']
                 gene_id = attributes_info['Parent']
                 mRNA_id = attributes_info['ID']
+                
                 gene_info.setdefault(gene_id,{})
                 gene_info[gene_id].setdefault('mRNA',{})
-                gene_info[gene_id]['mRNA'][mRNA_id] = {}
+                mRNA_info.setdefault(mRNA_id,{})
+                mRNA_info[mRNA_id]['pos'] = (start, end)
+                gene_info[gene_id]['mRNA'][mRNA_id] = mRNA_info[mRNA_id]
             else:
-                # pass
                 if not 'Parent' in attributes_info: raise FormatError('gff_no_parent',gff,line)
+                if gene_type in exon_type_name_set: gene_type = 'exon'
+                elif gene_type in CDS_type_name_set: gene_type = 'CDS'
+                elif gene_type in UTR3_type_name_set: gene_type = 'three_prime_UTR'
+                elif gene_type in UTR5_type_name_set: gene_type = 'five_prime_UTR'
                 mRNA_id = attributes_info['Parent']
                 mRNA_info.setdefault(mRNA_id,{})
                 mRNA_info[mRNA_id].setdefault(gene_type,[])
@@ -182,9 +213,6 @@ def parse_gff(gffs):
         GFF.close()
     for gff in gffs:
         parse_single_gff(gff)
-    for gene_id in gene_info:
-        for mRNA_id in gene_info[gene_id]['mRNA']: 
-            gene_info[gene_id]['mRNA'][mRNA_id] = mRNA_info[mRNA_id]
 
 def main(args):
 
@@ -257,6 +285,7 @@ def main(args):
                 # for minimap output (paf)
                 items = line.split('\t')
                 chro1,len_chro1,start1,end1,strand,chro2,len_chro2,start2,end2,residue_matches,alignment_length,mapping_quality = items[:12]
+                if (strand == '-'): start2, end2 = end2, start2
                 alignment_length = int(alignment_length)
                 if (alignment_length < args.min_alignment_length): continue
                 len_chro1 = int(len_chro1)
@@ -666,9 +695,17 @@ def main(args):
         print("[Info]\tThese genes will be displayed\t{}".format(', '.join(gene_id_display)))
         for gene_id in gene_id_display:
             strand = gene_info[gene_id]['strand']
-            mRNA_id = sorted(gene_info[gene_id]['mRNA'].keys())[0]
+            mRNA_id = max(gene_info[gene_id]['mRNA'].keys(), key = lambda mRNA_id: mRNA_info[mRNA_id]['pos'][1] - mRNA_info[mRNA_id]['pos'][0])
             gene_itv = gene_info[gene_id]['gene']
-            exons = gene_info[gene_id]['mRNA'][mRNA_id]['exon']
+            if 'exon' in gene_info[gene_id]['mRNA'][mRNA_id]:
+                exons = gene_info[gene_id]['mRNA'][mRNA_id]['exon']
+            else:
+                exons = interval.complement(
+                    gene_info[gene_id]['mRNA'][mRNA_id]['pos'],
+                        gene_info[gene_id]['mRNA'][mRNA_id]['CDS'] if 'CDS' in gene_info[gene_id]['mRNA'][mRNA_id] else [] +
+                        gene_info[gene_id]['mRNA'][mRNA_id]['three_prime_UTR'] if 'three_prime_UTR' in gene_info[gene_id]['mRNA'][mRNA_id] else [] +
+                        gene_info[gene_id]['mRNA'][mRNA_id]['five_prime_UTR'] if 'five_prime_UTR' in gene_info[gene_id]['mRNA'][mRNA_id] else []
+                )
             UTR3s=[]
             UTR5s=[]
             if 'three_prime_UTR' in gene_info[gene_id]['mRNA'][mRNA_id]: 
