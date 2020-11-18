@@ -112,7 +112,7 @@ class FatalError(Exception):
         if(self.ErrorType == 2):
             return('\n\t[Error] Did not find any alignment!\n\tPlease relax the filter or modify the KARYOTYPE\n')
 
-#在本程序中 Chro 的实例对象都是匿名的，存储在一个字典中
+# 在本程序中 Chro 的实例对象都是匿名的，存储在一个字典中
 class Chro():
     def __init__(self, name, real_name, start, end, is_full):
         self.name = real_name if real_name else name
@@ -514,18 +514,18 @@ def main(args):
         P = open(args.parameter,'r')
         level = 0
         for line in P:
-            m1 = re.search(r'label_font_size=(\d+(\.\d+)?)',line)
+            m1 = re.search(r'.*label_font_size=(\d+(\.\d+)?)',line)
             if m1:label_font_size[level] = m1.group(1)
-            m2 = re.search(r'show_pos_with_label=(\d+(\.\d+)?)',line)
+            m2 = re.search(r'.*show_pos_with_label=(\d+(\.\d+)?)',line)
             if m2:show_pos_with_label[level] = m2.group(1)
-            m3 = re.search(r'no_label=(\d+(\.\d+)?)',line)
+            m3 = re.search(r'.*no_label=(\d+(\.\d+)?)',line)
             if m3:no_label[level] = m3.group(1)
-            m4 = re.search(r'gap_length=(\d+(\.\d+)?)',line)
+            m4 = re.search(r'.*gap_length=(\d+(\.\d+)?)',line)
             if m4:gap_length[level] = float(m4.group(1))
-            m5 = re.search(r'label_angle=(\d+(\.\d+)?)',line)
+            m5 = re.search(r'.*label_angle=(\d+(\.\d+)?)',line)
             if m5:label_angle[level] = 360-float(m5.group(1))
-            m6 = re.match(r'chro_axis=(\d+(\.\d+)?)',line)
-            if m6:chro_axis[level] = m6.group(1)
+            m6 = re.match(r'.*chro_axis=(\d+(\.\d+)?)',line)
+            if m6:chro_axis[level] = int(m6.group(1))
             level += 1
         P.close()
     for level,chrs in enumerate(order): #对middle_spaces[level]进行赋值
@@ -581,7 +581,7 @@ def main(args):
         top += space_vertical #距离画布顶端的位置
         for chro in chros:
             # 如果该序列有长度信息，那么判断是否是完整的，因为不完整的一侧会画一条线段
-            if(chro_lst[chro].name in chro_len):
+            if(chro_lst[chro].name in chro_len and not args.no_dash):
                 chro_lst[chro].is_full = [chro_lst[chro].start==1, chro_lst[chro].end==chro_len[chro_lst[chro].name]]
             chro_lst[chro].level = level
             chro_lst[chro].top = top
@@ -880,9 +880,9 @@ def main(args):
             '<text x="{}" y="{}" fill="black"  font-size="{}" class="scale-text">{}</text>'.format(scale_x+L*scale/3,scale_y-10,args.label_font_size,S)
         )
     
-    if(args.highlight):
-        if not os.path.exists(args.highlight): raise ArgumentError('highlight',args.highlight)
-        H = open(args.highlight,'r')
+    if (args.highlight):
+        if not os.path.exists(args.highlight): raise ArgumentError('highlight', args.highlight)
+        H = open(args.highlight, 'r')
         for line in H:
             if line.startswith('#'): continue
             line = line.strip()
@@ -891,21 +891,19 @@ def main(args):
             else: color = 'red'
             chro = items[0]
             start = int(items[1])
-            end = int(items[2]) + 1
-
+            end = int(items[2])
             chros = [x for x in all_names if x == chro or x.startswith(chro + split_mark)]
-            
             for chro in chros:
                 if not chro in chro_lst: continue
-                relation_tmp = interval.relation([start,end],[chro_lst[chro].start,chro_lst[chro].end])
+                relation_tmp = interval.relation([start, end], [chro_lst[chro].start, chro_lst[chro].end])
                 if relation_tmp == 1:
                     continue
-                elif relation_tmp == 2 or relation_tmp == 3 :
-                    start,end = interval.intersection([start,end],[chro_lst[chro].start,chro_lst[chro].end])
-                highlight_width = chro_lst[chro].coordinate(end,is_up)[0]-chro_lst[chro].coordinate(start,is_up,is_start=True)[0]
+                elif relation_tmp == 0 or relation_tmp == 2 or relation_tmp == 3:
+                    start, end = interval.intersection([start, end], [chro_lst[chro].start, chro_lst[chro].end])
+                highlight_width = chro_lst[chro].coordinate(end + 1, is_up)[0] - chro_lst[chro].coordinate(start, is_up, is_start=True)[0]
                 if args.hl_min1px and highlight_width < 1: highlight_width = 1
                 svg_content_highlight.append(
-                    '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />'.format(chro_lst[chro].coordinate(start,is_up,is_start=True)[0],chro_lst[chro].top, highlight_width,args.chro_thickness,color)
+                    '<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />'.format(chro_lst[chro].coordinate(start, is_up, is_start=True)[0], chro_lst[chro].top, highlight_width, args.chro_thickness, color)
                 )
         H.close()
 
@@ -934,6 +932,7 @@ if __name__ == '__main__':
     parser.add_argument('--svg_height',default=800,type=int,help='height of svg, default=800')
     parser.add_argument('--svg_width',default=1200,type=int,help='width of svg, default=1200')
     parser.add_argument('--svg_space',default=0.2,type=float,help='The proportion of white space left and right, default=0.2')
+    parser.add_argument('--no_dash',action="store_true",help='Force no dashes on both sides of chromosomes')
     parser.add_argument('--chro_thickness',default=15,type=int,help='thickness of chromosome, default=15')
     parser.add_argument('-n','--no_label',action="store_true",help='Do not show labels')
     parser.add_argument('--label_font_size',default=18,type=int,help='font size of the label, default=18')
