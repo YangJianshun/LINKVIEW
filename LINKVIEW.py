@@ -8,6 +8,7 @@ import sys
 import os
 import random
 import interval
+import cairosvg
 
 style_css = {
     'classic': '''
@@ -918,7 +919,11 @@ def main(args):
     O.write(svg_content)
     O.close()
 
-    os.system('inkscape --file {}.svg --export-png {}.png --export-background white --export-dpi 350'.format(args.output,args.output))   
+    # os.system('inkscape --file {}.svg --export-png {}.png --export-background white --export-dpi 350'.format(args.output,args.output))   
+    cairosvg.svg2png(url=f'{args.output}.svg',
+                     write_to=f'{args.output}.png',
+                     dpi=350,
+                     background_color='white')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
