@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 ## _*_coding:utf-8_*_
 from __future__ import division
 import argparse
@@ -915,14 +915,15 @@ def main(args):
     svg_content = ''.join(svg_content)
 
     #print(svg_content)
-    O = open(args.output+'.svg','w')
+    O = open(args.output + '.svg', 'w')
     O.write(svg_content)
     O.close()
-
-    # os.system('inkscape --file {}.svg --export-png {}.png --export-background white --export-dpi 350'.format(args.output,args.output))   
-    cairosvg.svg2png(url=f'{args.output}.svg',
+    if args.svg2png == 'inkscape':
+        os.system('inkscape --file {0}.svg --export-png {0}.png --export-background white --export-dpi {1}'.format(args.output, args.svg2png_dpi))   
+    elif args.svg2png == 'cairosvg':
+        cairosvg.svg2png(url=f'{args.output}.svg',
                      write_to=f'{args.output}.png',
-                     dpi=350,
+                     dpi=args.svg2png_dpi,
                      background_color='white')
 
 if __name__ == '__main__':
@@ -958,7 +959,8 @@ if __name__ == '__main__':
     parser.add_argument('-g','--gff',help='One or multiple gff files, Separated by commas. Required for mapping genetic structures.')
     parser.add_argument('--bezier',action="store_true",help='Draw in Bezier style')
     parser.add_argument('--style', default='classic', help='Drawing style, we have two built-in styles: classic, simple. default=classic')
-    
+    parser.add_argument('--svg2png', default='cairosvg', help='How to render SVG to PNG. It can be set to cairosvg or inkscape, otherwise SVG will not be converted to PNG. default=cairosvg')
+    parser.add_argument('--svg2png_dpi', default=350, type=int, help='DPI parameter of svg2png. default=350')
     
     args=parser.parse_args()
     if args.label_angle:args.label_angle = 360-float(args.label_angle)
