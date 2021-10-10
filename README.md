@@ -1,4 +1,7 @@
+最新提示：请使用 [LINKVIEW2](https://github.com/YangJianshun/LINKVIEW2)
+
 # LINKVIEW
+
 LINKVIEW 是一个将序列比对结果（或其它任何适合的数据）进行可视化作图的工具。
 本工具设计灵感来源于 circo s软件，因为在日常工作中需要对 blast 比对结果进行可视化显示，但是找不到合适的软件(circos 仅能作环状的图)，所以开发了这款工具。
 使用 LINKVIEW 可以绘制出整体或局部的比对情况，支持自定义高亮、导入 gff 文件以绘制基因结构、有多种风格供选择。请看效果图：
@@ -38,7 +41,6 @@ cairosvg 是一个 python 模块，可以通过`pip3 install cairosvg`安装。
     ./LINKVIEW.py [-t TYPE] input
     ```
 
-    
 2. KARYOTYPE 文件 
     若不指定 KARYOTYPE 文件，LINKVIEW 会绘制输入文件中的所有染色体，并自动分配它们在图中的位置。
     通过-k参数指定一个 KARYOTYPE 文件，可以指定需要绘制的染色体及其在图中的位置和所需绘制的区间。
